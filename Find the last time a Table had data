@@ -1,0 +1,33 @@
+Here is the query illustrates this technique;
+
+SELECT DISTINCT
+t.[name] AS [UserTableName],
+[create_date] AS [CreatedDate],
+[modify_date] AS [ModifiedDate]
+FROM sys.tables t
+JOIN sys.dm_db_partition_stats s
+ON     t.object_id = s.object_id
+AND t.type_desc = ‘USER_TABLE’
+AND s.index_id IN (0, 1) –to include clustered index (1) or hash table (0)
+ORDER BY 3 DESC 
+
+Also, we can add a WHERE clause to limit the results to only to display, changes that have occurred in the last week, month, year, … Such as:
+
+SELECT DISTINCT
+t.[name] AS [UserTableName],
+[create_date] AS [CreatedDate],
+[modify_date] AS [ModifiedDate]
+FROM sys.tables t
+JOIN sys.dm_db_partition_stats s
+ON     t.object_id = s.object_id
+AND t.type_desc = ‘USER_TABLE’
+AND s.index_id IN (0, 1) –to include clustered index (1) or hash table (0)
+AND t.[name] IN (SELECT [name]
+FROM sys.tables
+WHERE ((DATEDIFF (d, create_date, GETDATE ()) =
+1)
+OR (DATEDIFF (d, modify_date, GETDATE ()) =
+1))
+AND (create_date <> modify_date)
+)
+ORDER BY 3 DESC 
