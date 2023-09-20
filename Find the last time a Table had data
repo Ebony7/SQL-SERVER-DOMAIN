@@ -31,3 +31,13 @@ OR (DATEDIFF (d, modify_date, GETDATE ()) =
 AND (create_date <> modify_date)
 )
 ORDER BY 3 DESC 
+
+Also, we can use sys.object table too for the same purpose;
+
+SELECT
+[name] AS [UserTableName]
+, create_date AS [CreatedDate]
+, modify_date AS [ModifiedDate]
+FROM sys.objects
+WHERE [type] = ‘U’ –to only display ‘USER_TABLE’
+ORDER BY 3 DESC
